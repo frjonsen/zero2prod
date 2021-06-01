@@ -7,3 +7,31 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-web = "4.0.0-beta.6"
+config = "0.11.0"
+serde = { version = "1", features = ["derive"]}
+
+[dependencies.sqlx]
+version = "0.5.4"
+default-features = false
+features = [
+    "runtime-actix-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
+
+[dev-dependencies]
+actix-rt = "2"
+reqwest = "0.11"
+test-case = "1.1.0"
+tokio = "1"
