@@ -9,20 +9,40 @@ pub struct Settings {
     pub application: ApplicationSettings,
 }
 
+fn default_application_port() -> u16 {
+    8080
+}
+
 #[derive(serde::Deserialize)]
 pub struct ApplicationSettings {
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde(
+        deserialize_with = "deserialize_number_from_string",
+        default = "default_application_port"
+    )]
     pub port: u16,
     pub host: String,
 }
 
+fn default_database_name() -> String {
+    "newsletter".to_string()
+}
+
+fn default_database_port() -> u16 {
+    5432
+}
+
 #[derive(serde::Deserialize)]
 pub struct DatabaseSettings {
+    #[serde(default = "default_database_name")]
     pub username: String,
     pub password: String,
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde(
+        deserialize_with = "deserialize_number_from_string",
+        default = "default_database_port"
+    )]
     pub port: u16,
     pub host: String,
+    #[serde(default = "default_database_name")]
     pub database_name: String,
 }
 
