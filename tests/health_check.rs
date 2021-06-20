@@ -109,16 +109,38 @@ async fn subscribe_returns_200_for_valid_form_data() {
 #[test_case("email=ursula_le_guin%40gmail.com" => 400; "missing the name")]
 #[test_case("" => 400; "missing both name and email")]
 #[actix_rt::test]
-async fn test_foo(invalid_body: &'static str) -> u16 {
+async fn test_simple(body: &'static str) -> u16 {
     let app = spawn_app().await;
     let client = reqwest::Client::new();
     let response = client
         .post(format!("{}/subscriptions", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(invalid_body)
+        .body(body)
         .send()
         .await
         .expect("Failed to execute request");
 
     response.status().as_u16()
+}
+
+#[test_case("name=&email=ursula_le_guin%40.gmail.com")]
+#[test_case("name=Ursula&email=")]
+#[test_case("name=Ursula&email=definitely-not-an-email")]
+#[actix_rt::test]
+async fn test_present_but_empty_parameters(body: &'static str) {
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let response = client
+        .post(format!("{}/subscriptions", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(
+        400,
+        response.status().as_u16(),
+        "The API did not return a 200 OK"
+    );
 }
